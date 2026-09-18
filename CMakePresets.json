@@ -1,0 +1,109 @@
+{
+  "version": 6,
+  "configurePresets": [
+    {
+      "name": "cpu",
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/build",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release",
+        "CMAKE_EXPORT_COMPILE_COMMANDS": "ON"
+      }
+    },
+    {
+      "name": "asan",
+      "inherits": "cpu",
+      "binaryDir": "${sourceDir}/build-asan",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug",
+        "KESTREL_SANITIZE": "ON"
+      }
+    },
+    {
+      "name": "metal",
+      "inherits": "cpu",
+      "binaryDir": "${sourceDir}/build-metal",
+      "cacheVariables": {
+        "KESTREL_METAL": "ON"
+      }
+    },
+    {
+      "name": "cuda",
+      "inherits": "cpu",
+      "binaryDir": "${sourceDir}/build-cuda",
+      "cacheVariables": {
+        "KESTREL_CUDA": "ON"
+      }
+    },
+    {
+      "name": "ubsan",
+      "inherits": "asan",
+      "binaryDir": "${sourceDir}/build-ubsan",
+      "cacheVariables": {
+        "KESTREL_SANITIZERS": "undefined"
+      }
+    }
+  ],
+  "buildPresets": [
+    {
+      "name": "cpu",
+      "configurePreset": "cpu"
+    },
+    {
+      "name": "asan",
+      "configurePreset": "asan"
+    },
+    {
+      "name": "metal",
+      "configurePreset": "metal"
+    },
+    {
+      "name": "cuda",
+      "configurePreset": "cuda"
+    },
+    {
+      "name": "ubsan",
+      "configurePreset": "ubsan"
+    }
+  ],
+  "testPresets": [
+    {
+      "name": "cpu",
+      "configurePreset": "cpu",
+      "output": {
+        "outputOnFailure": true
+      }
+    },
+    {
+      "name": "asan",
+      "configurePreset": "asan",
+      "output": {
+        "outputOnFailure": true
+      }
+    },
+    {
+      "name": "metal",
+      "configurePreset": "metal",
+      "output": {
+        "outputOnFailure": true
+      }
+    },
+    {
+      "name": "cuda",
+      "configurePreset": "cuda",
+      "output": {
+        "outputOnFailure": true
+      }
+    },
+    {
+      "name": "ubsan",
+      "configurePreset": "ubsan",
+      "output": {
+        "outputOnFailure": true
+      },
+      "execution": {
+        "timeout": 60
+      }
+    }
+  ]
+}
