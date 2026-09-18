@@ -1,0 +1,10 @@
+{
+  "chip_type": "Apple M2 Pro",
+  "machine_model": "Mac14,9",
+  "machine_name": "MacBook Pro",
+  "physical_memory": "16 GB",
+  "gpu": {
+    "sppci_cores": "16",
+    "sppci_model": "Apple M2 Pro"
+  }
+}

@@ -1,0 +1,23 @@
+[
+  {
+    "command": [
+      "build-audit-asan/kestrel",
+      "--help"
+    ],
+    "status": "timeout after 8 seconds",
+    "stdout": "",
+    "stderr": "",
+    "sample_returncode": 0,
+    "sample_diagnostic": "Sampling process 38595 for 1 second with 1 millisecond of run time between samples\nSampling completed, processing symbols...\nSample analysis of process 38595 written to file benchmarks/results/asan-stack.txt\n"
+  },
+  {
+    "command": [
+      "/tmp/kestrel-asan-probe"
+    ],
+    "status": "timeout after 8 seconds",
+    "stdout": "",
+    "stderr": "",
+    "sample_returncode": 0,
+    "sample_diagnostic": "Sampling process 38689 for 1 second with 1 millisecond of run time between samples\nSampling completed, processing symbols...\nSample analysis of process 38689 written to file benchmarks/results/asan-stack.txt\n"
+  }
+]

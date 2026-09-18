@@ -1,0 +1,78 @@
+Internal ctest changing into directory: /Users/derrickratnaharan/kestral/build-audit
+Test project /Users/derrickratnaharan/kestral/build-audit
+      Start  1: fixture
+ 1/11 Test  #1: fixture ..........................   Passed    0.03 sec
+      Start  2: unit
+ 2/11 Test  #2: unit .............................   Passed    0.34 sec
+      Start  3: reference_model
+ 3/11 Test  #3: reference_model ..................   Passed    3.35 sec
+      Start  4: reference_ops
+ 4/11 Test  #4: reference_ops ....................   Passed    0.28 sec
+      Start  5: unit_metal
+ 5/11 Test  #5: unit_metal .......................***Failed    0.02 sec
+FAIL after 427 checks: no Metal device available
+
+      Start  6: reference_ops_metal
+ 6/11 Test  #6: reference_ops_metal ..............***Failed    0.09 sec
+no Metal device available
+Traceback (most recent call last):
+  File "/Users/derrickratnaharan/kestral/tools/validate_ops.py", line 12, in <module>
+    j = json.loads(subprocess.check_output([a.executable, a.backend], text=True))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/derrickratnaharan/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/subprocess.py", line 466, in check_output
+    return run(*popenargs, stdout=PIPE, timeout=timeout, check=True,
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/derrickratnaharan/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/subprocess.py", line 571, in run
+    raise CalledProcessError(retcode, process.args,
+subprocess.CalledProcessError: Command '['/Users/derrickratnaharan/kestral/build-audit/kestrel_ops', 'metal']' returned non-zero exit status 1.
+
+      Start  7: reference_model_metal
+ 7/11 Test  #7: reference_model_metal ............***Failed    1.95 sec
+no Metal device available
+Traceback (most recent call last):
+  File "/Users/derrickratnaharan/kestral/tools/validate.py", line 123, in <module>
+    main()
+  File "/Users/derrickratnaharan/kestral/tools/validate.py", line 82, in main
+    subprocess.run(
+  File "/Users/derrickratnaharan/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/subprocess.py", line 571, in run
+    raise CalledProcessError(retcode, process.args,
+subprocess.CalledProcessError: Command '['/Users/derrickratnaharan/kestral/build-audit/kestrel_trace', '/Users/derrickratnaharan/kestral/build-audit/fixture', 'metal', '1,5,9,4,7', '/var/folders/wc/v7dqrspx2kvbd26flpz_9t700000gn/T/kestrel-validate-ujab6uup/trace.json']' returned non-zero exit status 1.
+
+      Start  8: integration
+ 8/11 Test  #8: integration ......................   Passed    0.57 sec
+      Start  9: reference_variants
+ 9/11 Test  #9: reference_variants ...............***Failed    1.22 sec
+OMP: Error #179: Function Can't open SHM failed:
+OMP: System error #0: Undefined error: 0
+Traceback (most recent call last):
+  File "/Users/derrickratnaharan/kestral/tools/validate_variants.py", line 52, in <module>
+    subprocess.run(
+  File "/Users/derrickratnaharan/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/subprocess.py", line 571, in run
+    raise CalledProcessError(retcode, process.args,
+subprocess.CalledProcessError: Command '['/Users/derrickratnaharan/kestral/.venv/bin/python', '/Users/derrickratnaharan/kestral/tools/validate.py', '--model', '/var/folders/wc/v7dqrspx2kvbd26flpz_9t700000gn/T/kestrel-variants-hk0b5exj/f16', '--executable', '/Users/derrickratnaharan/kestral/build-audit/kestrel_trace', '--backend', 'cpu', '--output', '/var/folders/wc/v7dqrspx2kvbd26flpz_9t700000gn/T/kestrel-variants-hk0b5exj/f16/result.json']' died with <Signals.SIGABRT: 6>.
+
+      Start 10: reference_variants_metal
+10/11 Test #10: reference_variants_metal .........***Failed    1.38 sec
+OMP: Error #179: Function Can't open SHM failed:
+OMP: System error #0: Undefined error: 0
+Traceback (most recent call last):
+  File "/Users/derrickratnaharan/kestral/tools/validate_variants.py", line 52, in <module>
+    subprocess.run(
+  File "/Users/derrickratnaharan/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/subprocess.py", line 571, in run
+    raise CalledProcessError(retcode, process.args,
+subprocess.CalledProcessError: Command '['/Users/derrickratnaharan/kestral/.venv/bin/python', '/Users/derrickratnaharan/kestral/tools/validate.py', '--model', '/var/folders/wc/v7dqrspx2kvbd26flpz_9t700000gn/T/kestrel-variants-2_grrd5i/f16', '--executable', '/Users/derrickratnaharan/kestral/build-audit/kestrel_trace', '--backend', 'metal', '--output', '/var/folders/wc/v7dqrspx2kvbd26flpz_9t700000gn/T/kestrel-variants-2_grrd5i/f16/result.json']' died with <Signals.SIGABRT: 6>.
+
+      Start 11: runtime_dependency_audit
+11/11 Test #11: runtime_dependency_audit .........   Passed    0.04 sec
+
+55% tests passed, 5 tests failed out of 11
+
+Total Test time (real) =   9.30 sec
+
+The following tests FAILED:
+	  5 - unit_metal (Failed)
+	  6 - reference_ops_metal (Failed)
+	  7 - reference_model_metal (Failed)
+	  9 - reference_variants (Failed)
+	 10 - reference_variants_metal (Failed)
+Errors while running CTest

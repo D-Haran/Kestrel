@@ -1,0 +1,30 @@
+{
+  "repository": "sdobson/tinystories-llama-15m",
+  "revision": "6cc2bab8c4a55cce6f7532317af84a94bb340d5e",
+  "files": {
+    "config.json": {
+      "bytes": 640,
+      "sha256": "fb762c604de61abf16655fb911b401743d5c992540389e8fe16a05769da3831b"
+    },
+    "model.safetensors": {
+      "bytes": 60772968,
+      "sha256": "8e291ca975614c7d76c01610e753eaa64e4563e9796c0b0791310333893e0ebb"
+    },
+    "tokenizer.model": {
+      "bytes": 499723,
+      "sha256": "9e556afd44213b6bd1be2b850ebbbd98f5481437a8021afaf58ee7fb1818d347"
+    },
+    "tokenizer_config.json": {
+      "bytes": 904,
+      "sha256": "4c5c3412fd84a238296c864fbd2690e87c1ef6fdee54fb278d7f37748c5d9776"
+    },
+    "special_tokens_map.json": {
+      "bytes": 414,
+      "sha256": "6fa06efa2785e450051989a6f8fb4416b10149ded485ddd3f127a40734f5cfd0"
+    },
+    "README.md": {
+      "bytes": 4239,
+      "sha256": "7151c23efb658b7e98cfbc3bb73fb1d1ffaaa8f86cf4139a32240d043924d740"
+    }
+  }
+}

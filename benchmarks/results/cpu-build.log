@@ -1,0 +1,31 @@
+-- The CXX compiler identification is AppleClang 17.0.0.17000319
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Check for working CXX compiler: /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++ - skipped
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+-- Found Python3: /Users/derrickratnaharan/kestral/.venv/bin/python (found version "3.12.14") found components: Interpreter
+-- Configuring done (0.4s)
+-- Generating done (0.0s)
+-- Build files have been written to: /Users/derrickratnaharan/kestral/build-audit-cpu
+[1/21] Building CXX object CMakeFiles/kestrel_core.dir/src/tensor.cpp.o
+[2/21] Building CXX object CMakeFiles/kestrel_core.dir/src/backends/cpu.cpp.o
+[3/21] Building CXX object CMakeFiles/kestrel_core.dir/src/safetensors.cpp.o
+[4/21] Building CXX object CMakeFiles/kestrel_core.dir/src/cache.cpp.o
+[5/21] Building CXX object CMakeFiles/kestrel_core.dir/src/config.cpp.o
+[6/21] Building CXX object CMakeFiles/kestrel_core.dir/src/model.cpp.o
+[7/21] Building CXX object CMakeFiles/kestrel_core.dir/src/generation.cpp.o
+[8/21] Building CXX object CMakeFiles/kestrel_core.dir/src/sampling.cpp.o
+[9/21] Building CXX object CMakeFiles/kestrel_core.dir/src/tokenizer.cpp.o
+[10/21] Building CXX object CMakeFiles/kestrel_core.dir/src/profiler.cpp.o
+[11/21] Linking CXX static library libkestrel_core.a
+[12/21] Building CXX object CMakeFiles/kestrel_trace.dir/tools/trace.cpp.o
+[13/21] Linking CXX executable kestrel_trace
+[14/21] Building CXX object CMakeFiles/kestrel_tests.dir/tests/test_main.cpp.o
+[15/21] Linking CXX executable kestrel_tests
+[16/21] Building CXX object CMakeFiles/kestrel_ops.dir/tools/ops.cpp.o
+[17/21] Linking CXX executable kestrel_ops
+[18/21] Building CXX object CMakeFiles/kestrel.dir/src/main.cpp.o
+[19/21] Linking CXX executable kestrel
+[20/21] Building CXX object CMakeFiles/kestrel_bench.dir/benchmarks/main.cpp.o
+[21/21] Linking CXX executable kestrel_bench

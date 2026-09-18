@@ -1,0 +1,33 @@
+Internal ctest changing into directory: /Users/derrickratnaharan/kestral/build-audit-ubsan
+Test project /Users/derrickratnaharan/kestral/build-audit-ubsan
+    Start 1: fixture
+1/7 Test #1: fixture ..........................   Passed    0.03 sec
+    Start 2: unit
+2/7 Test #2: unit .............................   Passed    0.40 sec
+    Start 3: reference_model
+3/7 Test #3: reference_model ..................   Passed    3.63 sec
+    Start 4: reference_ops
+4/7 Test #4: reference_ops ....................   Passed    0.32 sec
+    Start 5: integration
+5/7 Test #5: integration ......................   Passed    1.06 sec
+    Start 6: reference_variants
+6/7 Test #6: reference_variants ...............***Failed    1.04 sec
+OMP: Error #179: Function Can't open SHM failed:
+OMP: System error #0: Undefined error: 0
+Traceback (most recent call last):
+  File "/Users/derrickratnaharan/kestral/tools/validate_variants.py", line 52, in <module>
+    subprocess.run(
+  File "/Users/derrickratnaharan/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/subprocess.py", line 571, in run
+    raise CalledProcessError(retcode, process.args,
+subprocess.CalledProcessError: Command '['/Users/derrickratnaharan/kestral/.venv/bin/python', '/Users/derrickratnaharan/kestral/tools/validate.py', '--model', '/var/folders/wc/v7dqrspx2kvbd26flpz_9t700000gn/T/kestrel-variants-434avlhy/f16', '--executable', '/Users/derrickratnaharan/kestral/build-audit-ubsan/kestrel_trace', '--backend', 'cpu', '--output', '/var/folders/wc/v7dqrspx2kvbd26flpz_9t700000gn/T/kestrel-variants-434avlhy/f16/result.json']' died with <Signals.SIGABRT: 6>.
+
+    Start 7: runtime_dependency_audit
+7/7 Test #7: runtime_dependency_audit .........   Passed    0.03 sec
+
+86% tests passed, 1 tests failed out of 7
+
+Total Test time (real) =   6.52 sec
+
+The following tests FAILED:
+	  6 - reference_variants (Failed)
+Errors while running CTest

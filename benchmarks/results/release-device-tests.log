@@ -1,0 +1,28 @@
+Internal ctest changing into directory: /Users/derrickratnaharan/kestral/build-audit
+Test project /Users/derrickratnaharan/kestral/build-audit
+      Start  1: fixture
+ 1/11 Test  #1: fixture ..........................   Passed    0.03 sec
+      Start  2: unit
+ 2/11 Test  #2: unit .............................   Passed    0.01 sec
+      Start  3: reference_model
+ 3/11 Test  #3: reference_model ..................   Passed    2.16 sec
+      Start  4: reference_ops
+ 4/11 Test  #4: reference_ops ....................   Passed    0.09 sec
+      Start  5: unit_metal
+ 5/11 Test  #5: unit_metal .......................   Passed    0.16 sec
+      Start  6: reference_ops_metal
+ 6/11 Test  #6: reference_ops_metal ..............   Passed    0.12 sec
+      Start  7: reference_model_metal
+ 7/11 Test  #7: reference_model_metal ............   Passed    1.71 sec
+      Start  8: integration
+ 8/11 Test  #8: integration ......................   Passed    0.18 sec
+      Start  9: reference_variants
+ 9/11 Test  #9: reference_variants ...............   Passed    8.98 sec
+      Start 10: reference_variants_metal
+10/11 Test #10: reference_variants_metal .........   Passed   11.34 sec
+      Start 11: runtime_dependency_audit
+11/11 Test #11: runtime_dependency_audit .........   Passed    0.04 sec
+
+100% tests passed, 0 tests failed out of 11
+
+Total Test time (real) =  24.81 sec

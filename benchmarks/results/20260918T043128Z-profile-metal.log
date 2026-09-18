@@ -1,0 +1,59 @@
+Kestrel Benchmark
+-----------------
+OS: "macOS 26.6"
+Machine: "Mac14,9"
+Chip: "Apple M2 Pro"
+Memory bytes: 17179869184
+Compiler: AppleClang 17.0.0.17000319
+Build: Release
+Model: "sdobson/tinystories-llama-15m"
+Layers: 6
+Hidden size: 288
+KV heads: 6
+Weight dtype: "F32"
+Backend: metal
+Prompt / generated tokens: 16 / 32
+Batch size: 1
+warm-up 1/2 (excluded)
+warm-up 2/2 (excluded)
+Backend: metal
+Prefill: 36.59175127043953 tokens/s
+Decode: 39.21336802781354 tokens/s
+TTFT: 437.31091660000004 ms
+Inter-token p50/p95/p99: 25.29025 / 27.140125 / 27.755125 ms
+Weights / KV / peak RSS: 60766848 / 649728 / 210698240 bytes
+Operation                Calls     Total ms      Mean ms    % Runtime
+Activation gating          1410      575.870        0.408        9.380
+Attention                  1410      901.560        0.639       14.685
+Embedding                   235        0.222        0.001        0.004
+Final norm                  235       55.072        0.234        0.897
+K projection               1410      347.681        0.247        5.663
+KV append                  1410        0.747        0.001        0.012
+LM head                     235      230.031        0.979        3.747
+MLP down                   1410      478.838        0.340        7.800
+MLP gate                   1410      359.421        0.255        5.854
+MLP up                     1410      362.123        0.257        5.898
+Output projection          1410      350.281        0.248        5.706
+Q projection               1410      348.779        0.247        5.681
+RMSNorm                    2820      650.153        0.231       10.590
+Residual                   2820      564.260        0.200        9.191
+RoPE                       1410      548.698        0.389        8.937
+Sampling                    160        8.802        0.055        0.143
+V projection               1410      353.564        0.251        5.759
+Nested backend diagnostics (overlap operation times):
+{
+  "Encoding and submission": {
+    "calls": 25850,
+    "mean_ms": 0.007372007234042511,
+    "percent_forward_runtime": 0.0,
+    "percent_measured_runtime": 3.1040427988954895,
+    "total_ms": 190.5663869999989
+  },
+  "Waiting": {
+    "calls": 25850,
+    "mean_ms": 0.2141571227079315,
+    "percent_forward_runtime": 0.0,
+    "percent_measured_runtime": 90.17257491338744,
+    "total_ms": 5535.961622000029
+  }
+}

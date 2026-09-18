@@ -1,0 +1,8 @@
+Operation                Calls     Total ms    % Forward
+Attention                   216        1.437        0.217
+LM head                      36      400.511       60.415
+MLP                         216      173.123       26.115
+Output projection           216       21.692        3.272
+QKV projection              216       65.154        9.828
+RMSNorm                     252        0.072        0.011
+RoPE and cache              216        0.682        0.103

@@ -1,0 +1,20 @@
+Internal ctest changing into directory: /Users/derrickratnaharan/kestral/build-audit-cpu
+Test project /Users/derrickratnaharan/kestral/build-audit-cpu
+    Start 1: fixture
+1/7 Test #1: fixture ..........................   Passed    0.03 sec
+    Start 2: unit
+2/7 Test #2: unit .............................   Passed    0.01 sec
+    Start 3: reference_model
+3/7 Test #3: reference_model ..................   Passed    3.43 sec
+    Start 4: reference_ops
+4/7 Test #4: reference_ops ....................   Passed    0.10 sec
+    Start 5: integration
+5/7 Test #5: integration ......................   Passed    0.16 sec
+    Start 6: reference_variants
+6/7 Test #6: reference_variants ...............   Passed   10.01 sec
+    Start 7: runtime_dependency_audit
+7/7 Test #7: runtime_dependency_audit .........   Passed    0.04 sec
+
+100% tests passed, 0 tests failed out of 7
+
+Total Test time (real) =  13.79 sec

@@ -1,0 +1,44 @@
+Kestrel Benchmark
+-----------------
+OS: "macOS 26.6"
+Machine: "Mac14,9"
+Chip: "Apple M2 Pro"
+Memory bytes: 17179869184
+Compiler: AppleClang 17.0.0.17000319
+Build: Release
+Model: "sdobson/tinystories-llama-15m"
+Layers: 6
+Hidden size: 288
+KV heads: 6
+Weight dtype: "F32"
+Backend: cpu
+Prompt / generated tokens: 16 / 32
+Batch size: 1
+warm-up 1/2 (excluded)
+warm-up 2/2 (excluded)
+Backend: cpu
+Prefill: 52.328077543523385 tokens/s
+Decode: 49.81640579850995 tokens/s
+TTFT: 305.8163584 ms
+Inter-token p50/p95/p99: 19.036709 / 20.745917 / 28.777584 ms
+Weights / KV / peak RSS: 60766848 / 649728 / 68861952 bytes
+Operation                Calls     Total ms      Mean ms    % Runtime
+Activation gating          1410        2.385        0.002        0.051
+Attention                  1410       13.187        0.009        0.284
+Embedding                   235        0.177        0.001        0.004
+Final norm                  235        0.183        0.001        0.004
+K projection               1410      158.561        0.112        3.417
+KV append                  1410        0.652        0.000        0.014
+LM head                     235     2764.438       11.764       59.572
+MLP down                   1410      399.648        0.283        8.612
+MLP gate                   1410      407.753        0.289        8.787
+MLP up                     1410      421.303        0.299        9.079
+Output projection          1410      147.752        0.105        3.184
+Q projection               1410      155.711        0.110        3.355
+RMSNorm                    2820        1.182        0.000        0.025
+Residual                   2820        0.585        0.000        0.013
+RoPE                       1410        4.139        0.003        0.089
+Sampling                    160        8.512        0.053        0.183
+V projection               1410      151.611        0.108        3.267
+Nested backend diagnostics (overlap operation times):
+{}

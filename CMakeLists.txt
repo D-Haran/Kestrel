@@ -1,29 +1,15 @@
 cmake_minimum_required(VERSION 3.25)
 project(kestrel VERSION 0.1.0 LANGUAGES CXX)
-
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
-
 option(KESTREL_METAL "Build Apple Metal backend" OFF)
 option(KESTREL_CUDA "Build CUDA backend" OFF)
 option(KESTREL_SANITIZE "Enable sanitizers" OFF)
 set(KESTREL_SANITIZERS "address,undefined" CACHE STRING "Clang/GCC sanitizer list")
-
-add_library(kestrel_core
-  src/tensor.cpp
-  src/config.cpp
-  src/safetensors.cpp
-  src/backends/cpu.cpp
-  src/cache.cpp
-  src/model.cpp
-  src/generation.cpp
-  src/sampling.cpp
-  src/tokenizer.cpp
-  src/profiler.cpp)
+add_library(kestrel_core src/tensor.cpp src/config.cpp src/safetensors.cpp src/backends/cpu.cpp src/cache.cpp src/model.cpp src/generation.cpp src/sampling.cpp src/tokenizer.cpp src/profiler.cpp)
 target_include_directories(kestrel_core PUBLIC include third_party)
-target_compile_options(kestrel_core PRIVATE -Wall -Wextra -Wpedantic)
-
+target_compile_options(kestrel_core PRIVATE $<$<COMPILE_LANGUAGE:CXX>:-Wall;-Wextra;-Wpedantic>)
 if(KESTREL_SANITIZE AND KESTREL_CUDA)
   message(FATAL_ERROR "Use a CPU build for host sanitizers; use compute-sanitizer for CUDA")
 endif()
@@ -31,22 +17,41 @@ if(KESTREL_SANITIZE)
   target_compile_options(kestrel_core PUBLIC -fsanitize=${KESTREL_SANITIZERS} -fno-omit-frame-pointer)
   target_link_options(kestrel_core PUBLIC -fsanitize=${KESTREL_SANITIZERS})
 endif()
-
 include(CTest)
 if(BUILD_TESTING)
-  find_package(Python3 COMPONENTS Interpreter REQUIRED)
   add_executable(kestrel_tests tests/test_main.cpp)
   target_link_libraries(kestrel_tests PRIVATE kestrel_core)
+  find_package(Python3 COMPONENTS Interpreter REQUIRED)
   add_test(NAME fixture COMMAND ${Python3_EXECUTABLE} ${CMAKE_SOURCE_DIR}/tools/make_fixture.py ${CMAKE_BINARY_DIR}/fixture)
   set_tests_properties(fixture PROPERTIES FIXTURES_SETUP model_fixture)
   add_test(NAME unit COMMAND kestrel_tests ${CMAKE_BINARY_DIR}/fixture)
   set_tests_properties(unit PROPERTIES FIXTURES_REQUIRED model_fixture)
 endif()
-
+add_executable(kestrel_trace tools/trace.cpp)
+target_link_libraries(kestrel_trace PRIVATE kestrel_core)
+add_executable(kestrel_ops tools/ops.cpp)
+target_link_libraries(kestrel_ops PRIVATE kestrel_core)
+option(KESTREL_REFERENCE_TESTS "Run Python/Transformers reference tests (requires validation dependencies)" OFF)
+if(BUILD_TESTING AND KESTREL_REFERENCE_TESTS)
+  add_test(NAME reference_model COMMAND ${Python3_EXECUTABLE} ${CMAKE_SOURCE_DIR}/tools/validate.py --model ${CMAKE_BINARY_DIR}/fixture --executable $<TARGET_FILE:kestrel_trace> --output ${CMAKE_BINARY_DIR}/validation.json)
+  set_tests_properties(reference_model PROPERTIES FIXTURES_REQUIRED model_fixture)
+  add_test(NAME reference_ops COMMAND ${Python3_EXECUTABLE} ${CMAKE_SOURCE_DIR}/tools/validate_ops.py --executable $<TARGET_FILE:kestrel_ops>)
+endif()
 add_executable(kestrel src/main.cpp)
 target_link_libraries(kestrel PRIVATE kestrel_core)
 target_compile_definitions(kestrel PRIVATE KESTREL_TOKENIZER_HELPER="${CMAKE_SOURCE_DIR}/tools/tokenizer_bridge.py")
-
+add_executable(kestrel_bench benchmarks/main.cpp)
+target_link_libraries(kestrel_bench PRIVATE kestrel_core)
+execute_process(COMMAND git rev-parse HEAD WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+  OUTPUT_VARIABLE KESTREL_GIT_COMMIT OUTPUT_STRIP_TRAILING_WHITESPACE ERROR_QUIET)
+if(NOT KESTREL_GIT_COMMIT)
+  set(KESTREL_GIT_COMMIT "unknown")
+endif()
+target_compile_definitions(kestrel_bench PRIVATE
+  KESTREL_BUILD_TYPE="$<CONFIG>"
+  KESTREL_COMPILER="${CMAKE_CXX_COMPILER_ID} ${CMAKE_CXX_COMPILER_VERSION}"
+  KESTREL_CMAKE_VERSION="${CMAKE_VERSION}"
+  KESTREL_GIT_COMMIT="${KESTREL_GIT_COMMIT}")
 if(KESTREL_METAL)
   if(NOT APPLE)
     message(FATAL_ERROR "Metal requires macOS")
@@ -62,7 +67,20 @@ if(KESTREL_METAL)
   target_compile_definitions(kestrel_core PUBLIC KESTREL_HAS_METAL)
   target_link_libraries(kestrel_core PRIVATE "-framework Metal" "-framework Foundation")
 endif()
-
+if(BUILD_TESTING)
+  foreach(BACKEND IN ITEMS metal cuda)
+    string(TOUPPER ${BACKEND} UPPER_BACKEND)
+    if(KESTREL_${UPPER_BACKEND})
+      add_test(NAME unit_${BACKEND} COMMAND kestrel_tests ${CMAKE_BINARY_DIR}/fixture ${BACKEND})
+      set_tests_properties(unit_${BACKEND} PROPERTIES FIXTURES_REQUIRED model_fixture)
+      if(KESTREL_REFERENCE_TESTS)
+        add_test(NAME reference_ops_${BACKEND} COMMAND ${Python3_EXECUTABLE} ${CMAKE_SOURCE_DIR}/tools/validate_ops.py --executable $<TARGET_FILE:kestrel_ops> --backend ${BACKEND})
+        add_test(NAME reference_model_${BACKEND} COMMAND ${Python3_EXECUTABLE} ${CMAKE_SOURCE_DIR}/tools/validate.py --model ${CMAKE_BINARY_DIR}/fixture --executable $<TARGET_FILE:kestrel_trace> --backend ${BACKEND} --output ${CMAKE_BINARY_DIR}/validation-${BACKEND}.json)
+        set_tests_properties(reference_model_${BACKEND} PROPERTIES FIXTURES_REQUIRED model_fixture)
+      endif()
+    endif()
+  endforeach()
+endif()
 if(KESTREL_CUDA)
   enable_language(CUDA)
   find_package(CUDAToolkit 12 REQUIRED)
@@ -75,13 +93,18 @@ if(KESTREL_CUDA)
   target_compile_options(kestrel_core PRIVATE $<$<COMPILE_LANGUAGE:CUDA>:--fmad=false>)
   target_link_libraries(kestrel_core PRIVATE CUDA::cudart)
 endif()
-
 if(BUILD_TESTING)
-  foreach(BACKEND IN ITEMS metal cuda)
-    string(TOUPPER ${BACKEND} UPPER_BACKEND)
-    if(KESTREL_${UPPER_BACKEND})
-      add_test(NAME unit_${BACKEND} COMMAND kestrel_tests ${CMAKE_BINARY_DIR}/fixture ${BACKEND})
-      set_tests_properties(unit_${BACKEND} PROPERTIES FIXTURES_REQUIRED model_fixture)
+  add_test(NAME integration COMMAND ${Python3_EXECUTABLE} ${CMAKE_SOURCE_DIR}/tests/integration.py --binary $<TARGET_FILE:kestrel> --bench $<TARGET_FILE:kestrel_bench> --model ${CMAKE_BINARY_DIR}/fixture)
+  set_tests_properties(integration PROPERTIES FIXTURES_REQUIRED model_fixture)
+  if(KESTREL_REFERENCE_TESTS)
+    add_test(NAME reference_variants COMMAND ${Python3_EXECUTABLE} ${CMAKE_SOURCE_DIR}/tools/validate_variants.py --model ${CMAKE_BINARY_DIR}/fixture --executable $<TARGET_FILE:kestrel_trace>)
+    set_tests_properties(reference_variants PROPERTIES FIXTURES_REQUIRED model_fixture)
+    if(KESTREL_METAL)
+      add_test(NAME reference_variants_metal COMMAND ${Python3_EXECUTABLE} ${CMAKE_SOURCE_DIR}/tools/validate_variants.py --model ${CMAKE_BINARY_DIR}/fixture --executable $<TARGET_FILE:kestrel_trace> --backend metal)
+      set_tests_properties(reference_variants_metal PROPERTIES FIXTURES_REQUIRED model_fixture)
     endif()
-  endforeach()
+  endif()
+endif()
+if(BUILD_TESTING)
+  add_test(NAME runtime_dependency_audit COMMAND ${Python3_EXECUTABLE} ${CMAKE_SOURCE_DIR}/tools/audit_runtime.py)
 endif()
