@@ -28,14 +28,28 @@ class CpuBackend final : public Backend {
         require_size(x, checked_mul(batch, cols), "matmul input");
         require_size(y, checked_mul(batch, rows), "matmul output");
         const auto stride = dtype_size(w.dtype());
-        for (size_t b = 0; b < batch; ++b)
+        if (batch == 1) {
             for (size_t r = 0; r < rows; ++r) {
                 float sum = 0;
                 const auto *p = w.data() + r * cols * stride;
                 for (size_t c = 0; c < cols; ++c)
-                    sum += decode_scalar(p + c * stride, w.dtype()) * x[b * cols + c];
-                y[b * rows + r] = sum;
+                    sum += decode_scalar(p + c * stride, w.dtype()) * x[c];
+                y[r] = sum;
             }
+            return;
+        }
+        // Batched (prefill): decode each weight element once and reuse it across all batch
+        // rows, so the weight matrix is streamed from memory once instead of `batch` times.
+        for (size_t b = 0; b < batch * rows; ++b)
+            y[b] = 0;
+        for (size_t r = 0; r < rows; ++r) {
+            const auto *p = w.data() + r * cols * stride;
+            for (size_t c = 0; c < cols; ++c) {
+                float wv = decode_scalar(p + c * stride, w.dtype());
+                for (size_t b = 0; b < batch; ++b)
+                    y[b * rows + r] += wv * x[b * cols + c];
+            }
+        }
     }
     void rmsnorm(Input x, Input w, Output y, float eps) override {
         require_size(w, x.size(), "rmsnorm weight");

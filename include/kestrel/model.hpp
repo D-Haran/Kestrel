@@ -22,6 +22,12 @@ class Model {
     }
     // One causal transformer step; position must equal every layer's cache length.
     Vec forward(int token, size_t position, KVCache &cache, const Trace &trace = {});
+    // Process a whole prompt with batched (matrix-matrix) projections; fills the cache for
+    // positions [0, prompt.size()) and returns the last token's logits. No trace support.
+    Vec forward_prefill(std::span<const int> prompt, KVCache &cache);
+    bool backend_resident() const {
+        return backend_.supports_resident_forward();
+    }
     void reset_backend_state() {
         backend_.reset_resident_state();
     }

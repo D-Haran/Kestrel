@@ -122,6 +122,56 @@ Vec Model::forward_resident(int token, size_t pos) {
     backend_.resident_forward(embedding, layers, final_norm_, *head_, dims, pos, logits);
     return logits;
 }
+Vec Model::forward_prefill(std::span<const int> prompt, KVCache &cache) {
+    auto total = profiler.scope("__prefill");
+    auto &c = config_;
+    auto &b = backend_;
+    const size_t M = prompt.size(), h = c.hidden, inter = c.intermediate, hd = c.head_dim(),
+                 kvw = c.kv_heads * hd;
+    if (M == 0 || M > cache.capacity() || M > c.max_positions)
+        throw std::out_of_range("prefill prompt length exceeds capacity");
+    for (int token : prompt)
+        if (token < 0 || size_t(token) >= c.vocab)
+            throw std::out_of_range("token ID outside vocabulary");
+    Vec X(M * h), norm(M * h), Q(M * h), K(M * kvw), V(M * kvw), att(M * h), proj(M * h),
+        gate(M * inter), up(M * inter);
+    auto row = [](Vec &v, size_t i, size_t w) { return Output(v).subspan(i * w, w); };
+    for (size_t i = 0; i < M; ++i)
+        for (size_t j = 0; j < h; ++j)
+            X[i * h + j] = embedding_->at(size_t(prompt[i]) * h + j);
+    for (size_t l = 0; l < c.layers; ++l) {
+        const auto &w = layers_[l];
+        for (size_t i = 0; i < M; ++i)
+            b.rmsnorm(row(X, i, h), w.input_norm, row(norm, i, h), c.epsilon);
+        b.matmul(*w.q, norm, Q, M);
+        b.matmul(*w.k, norm, K, M);
+        b.matmul(*w.v, norm, V, M);
+        for (size_t i = 0; i < M; ++i) {
+            b.rope(row(Q, i, h), c.heads, hd, i, c.theta);
+            b.rope(row(K, i, kvw), c.kv_heads, hd, i, c.theta);
+        }
+        for (size_t i = 0; i < M; ++i) {
+            cache.append(l, i, row(K, i, kvw), row(V, i, kvw));
+            b.attention(row(Q, i, h), cache.keys(l), cache.values(l), row(att, i, h), c.heads,
+                        c.kv_heads, hd, i + 1);
+        }
+        b.matmul(*w.o, att, proj, M);
+        b.add(X, proj, X);
+        for (size_t i = 0; i < M; ++i)
+            b.rmsnorm(row(X, i, h), w.post_norm, row(norm, i, h), c.epsilon);
+        b.matmul(*w.gate, norm, gate, M);
+        b.matmul(*w.up, norm, up, M);
+        b.silu(gate, gate);
+        b.multiply(gate, up, gate);
+        b.matmul(*w.down, gate, proj, M);
+        b.add(X, proj, X);
+    }
+    // Only the final position is needed to sample the next token.
+    Vec last_norm(h), logits(c.vocab);
+    b.rmsnorm(row(X, M - 1, h), final_norm_, last_norm, c.epsilon);
+    b.matmul(*head_, last_norm, logits);
+    return logits;
+}
 Vec Session::prefill(std::span<const int> prompt, const Trace &trace) {
     if (prompt.empty())
         throw std::invalid_argument("prompt must contain at least one token");
@@ -133,9 +183,16 @@ Vec Session::prefill(std::span<const int> prompt, const Trace &trace) {
     reset();
     Vec logits;
     try {
-        for (int token : prompt) {
-            logits = model_.forward(token, position_, cache_, trace);
-            ++position_;
+        if (!trace && !model_.backend_resident()) {
+            // Batched matrix-matrix prefill (CPU path).
+            logits = model_.forward_prefill(prompt, cache_);
+            position_ = prompt.size();
+        } else {
+            // Resident per-token path (Metal) or the traced reference path.
+            for (int token : prompt) {
+                logits = model_.forward(token, position_, cache_, trace);
+                ++position_;
+            }
         }
     } catch (...) {
         reset();

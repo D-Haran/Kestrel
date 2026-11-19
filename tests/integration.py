@@ -68,7 +68,9 @@ with tempfile.TemporaryDirectory(prefix="kestrel-integration-") as d:
     )
     bench = json.loads((root / "bench.json").read_text())
     assert len(bench["runs"]) == 2 and bench["decode_steps_per_run"] == 3
-    assert bench["profile"]["LM head"]["calls"] == 2 * (3 + 3)
+    # Decode profiles the LM head per step (3 per run); batched prefill runs it once at the
+    # final position and is timed as the "__prefill" scope rather than per op.
+    assert bench["profile"]["LM head"]["calls"] == 2 * 3
     assert all(
         bench[key] > 0
         for key in [
