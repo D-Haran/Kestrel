@@ -42,7 +42,7 @@ Config Config::parse(const Json &j) {
         throw std::runtime_error("only model_type=llama is supported");
     if (j.contains("architectures") && j.at("architectures") != Json::array({"LlamaForCausalLM"}))
         throw std::runtime_error("unsupported Llama architecture");
-    for (auto key : {"rope_scaling", "quantization_config", "sliding_window", "rope_parameters"})
+    for (auto key : {"quantization_config", "sliding_window", "rope_parameters"})
         if (j.contains(key) && !j.at(key).is_null())
             throw std::runtime_error(std::string("unsupported config: ") + key);
     if (j.value("hidden_act", "silu") != "silu" || j.value("attention_bias", false) ||
@@ -65,6 +65,19 @@ Config Config::parse(const Json &j) {
         throw std::runtime_error("custom head_dim is unsupported");
     if (!(c.epsilon > 0) || !std::isfinite(c.epsilon) || !(c.theta > 0) || !std::isfinite(c.theta))
         throw std::runtime_error("invalid norm epsilon or RoPE theta");
+    if (j.contains("rope_scaling") && !j.at("rope_scaling").is_null()) {
+        const auto &rs = j.at("rope_scaling");
+        std::string type = rs.value("rope_type", rs.value("type", std::string()));
+        if (type != "llama3")
+            throw std::runtime_error("unsupported rope_scaling rope_type: " + type);
+        c.rope_llama3 = true;
+        c.rope_factor = rs.value("factor", 8.f);
+        c.rope_low_freq = rs.value("low_freq_factor", 1.f);
+        c.rope_high_freq = rs.value("high_freq_factor", 4.f);
+        c.rope_original_ctx = json_size(rs.at("original_max_position_embeddings"));
+        if (!(c.rope_factor > 0) || !(c.rope_high_freq > c.rope_low_freq) || !c.rope_original_ctx)
+            throw std::runtime_error("invalid llama3 rope_scaling parameters");
+    }
     c.bos = j.value("bos_token_id", 1);
     c.eos = j.value("eos_token_id", 2);
     c.tied = j.value("tie_word_embeddings", false);

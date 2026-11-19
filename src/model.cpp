@@ -1,6 +1,31 @@
 #include "kestrel/model.hpp"
+#include <cmath>
+#include <numbers>
 #include <stdexcept>
 namespace kestrel {
+// RoPE inverse frequencies (head_dim/2), applying llama3 wavelength-based scaling if enabled.
+// Mirrors Hugging Face's _compute_llama3_parameters.
+static Vec compute_inv_freq(const Config &c) {
+    const size_t dim = c.head_dim(), half = dim / 2;
+    Vec inv(half);
+    const double low_wl = double(c.rope_original_ctx) / c.rope_low_freq;
+    const double high_wl = double(c.rope_original_ctx) / c.rope_high_freq;
+    for (size_t i = 0; i < half; ++i) {
+        double freq = std::pow(double(c.theta), -2.0 * double(i) / double(dim));
+        if (c.rope_llama3) {
+            double wl = 2.0 * std::numbers::pi / freq;
+            if (wl > low_wl)
+                freq /= c.rope_factor;
+            else if (wl >= high_wl) {
+                double smooth = (double(c.rope_original_ctx) / wl - c.rope_low_freq) /
+                                (c.rope_high_freq - c.rope_low_freq);
+                freq = (1.0 - smooth) * (freq / c.rope_factor) + smooth * freq;
+            }
+        }
+        inv[i] = float(freq);
+    }
+    return inv;
+}
 const TensorView &Model::weight(const std::string &name, std::vector<size_t> shape) const {
     const auto &w = weights_.get(name);
     if (w.shape() != shape)
@@ -24,6 +49,7 @@ Model::Model(const std::filesystem::path &dir, Backend &backend)
                          {c.vocab, c.hidden});
     head_ = c.tied ? embedding_ : &weight("lm_head.weight", {c.vocab, c.hidden});
     final_norm_ = vector_weight("model.norm.weight", c.hidden);
+    inv_freq_ = compute_inv_freq(c);
     for (size_t i = 0; i < c.layers; ++i) {
         std::string p = "model.layers." + std::to_string(i) + ".";
         layers_.push_back({&weight(p + "self_attn.q_proj.weight", {c.hidden, c.hidden}),
@@ -57,7 +83,7 @@ Vec Model::forward(int token, size_t pos, KVCache &cache, const Trace &trace) {
     // Fast path: encode the whole step into one device command buffer with the KV cache and
     // activations resident. Tracing needs per-op host values, so it keeps the op-by-op path.
     if (b.supports_resident_forward() && !trace)
-        return forward_resident(token, pos);
+        return forward_resident(token, pos, cache.capacity());
     for (size_t l = 0; l < c.layers; ++l)
         if (cache.length(l) != pos)
             throw std::logic_error("inconsistent KV cache position; reset the session");
@@ -76,8 +102,8 @@ Vec Model::forward(int token, size_t pos, KVCache &cache, const Trace &trace) {
         profiler.measure("K projection", [&] { b.matmul(*w.k, norm, k); });
         profiler.measure("V projection", [&] { b.matmul(*w.v, norm, v); });
         profiler.measure("RoPE", [&] {
-            b.rope(q, c.heads, c.head_dim(), pos, c.theta);
-            b.rope(k, c.kv_heads, c.head_dim(), pos, c.theta);
+            b.rope(q, c.heads, c.head_dim(), pos, inv_freq_);
+            b.rope(k, c.kv_heads, c.head_dim(), pos, inv_freq_);
         });
         profiler.measure("KV append", [&] { cache.append(l, pos, k, v); });
         profiler.measure("Attention", [&] {
@@ -107,7 +133,7 @@ Vec Model::forward(int token, size_t pos, KVCache &cache, const Trace &trace) {
         trace("logits", pos, logits);
     return logits;
 }
-Vec Model::forward_resident(int token, size_t pos) {
+Vec Model::forward_resident(int token, size_t pos, size_t capacity) {
     auto &c = config_;
     Vec embedding(c.hidden);
     for (size_t i = 0; i < c.hidden; ++i)
@@ -116,10 +142,10 @@ Vec Model::forward_resident(int token, size_t pos) {
     layers.reserve(layers_.size());
     for (const auto &w : layers_)
         layers.push_back({w.q, w.k, w.v, w.o, w.gate, w.up, w.down, w.input_norm, w.post_norm});
-    ForwardDims dims{c.hidden,  c.intermediate, c.heads,   c.kv_heads,      c.head_dim(),
-                     c.vocab,   c.max_positions, c.epsilon, c.theta};
+    ForwardDims dims{c.hidden, c.intermediate, c.heads,    c.kv_heads, c.head_dim(),
+                     c.vocab,  capacity,       c.epsilon,  c.theta};
     Vec logits(c.vocab);
-    backend_.resident_forward(embedding, layers, final_norm_, *head_, dims, pos, logits);
+    backend_.resident_forward(embedding, layers, final_norm_, *head_, dims, inv_freq_, pos, logits);
     return logits;
 }
 Vec Model::forward_prefill(std::span<const int> prompt, KVCache &cache) {
@@ -147,8 +173,8 @@ Vec Model::forward_prefill(std::span<const int> prompt, KVCache &cache) {
         b.matmul(*w.k, norm, K, M);
         b.matmul(*w.v, norm, V, M);
         for (size_t i = 0; i < M; ++i) {
-            b.rope(row(Q, i, h), c.heads, hd, i, c.theta);
-            b.rope(row(K, i, kvw), c.kv_heads, hd, i, c.theta);
+            b.rope(row(Q, i, h), c.heads, hd, i, inv_freq_);
+            b.rope(row(K, i, kvw), c.kv_heads, hd, i, inv_freq_);
         }
         for (size_t i = 0; i < M; ++i) {
             cache.append(l, i, row(K, i, kvw), row(V, i, kvw));

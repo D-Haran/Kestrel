@@ -133,10 +133,11 @@ void math_tests(Backend &b) {
     near(sum, 1);
     near(out[3], 1 / (1 + std::exp(-1.f) + std::exp(-2.f) + std::exp(-3.f)));
     Vec rot = a;
-    b.rope(rot, 1, 4, 0, 10000);
+    Vec rope_freq{1.f, 0.01f}; // theta=10000, dim=4: pow(10000, -2i/4)
+    b.rope(rot, 1, 4, 0, rope_freq);
     for (size_t i = 0; i < 4; ++i)
         near(rot[i], a[i]);
-    b.rope(rot, 1, 4, 1, 10000);
+    b.rope(rot, 1, 4, 1, rope_freq);
     near(rot[0], std::cos(1.f) - 3 * std::sin(1.f));
     near(rot[1], 2 * std::cos(.01f) - 4 * std::sin(.01f));
     // Four Q heads share two KV heads. Zero queries make averaging exact.

@@ -159,20 +159,20 @@ class CudaBackend final : public Backend {
         finish();
         yb.copy(y);
     }
-    void rope(Output x, size_t heads, size_t dim, size_t position, float theta) override {
+    void rope(Output x, size_t heads, size_t dim, size_t position, Input inv_freq) override {
         require_size(x, checked_mul(heads, dim), "rope");
-        if (!dim || dim % 2 || !(theta > 0) || !std::isfinite(theta))
+        if (!dim || dim % 2)
             throw std::invalid_argument("invalid RoPE");
+        require_size(inv_freq, dim / 2, "rope inv_freq");
         cuda_kernels::Params p{};
         p.heads = u32(heads);
         p.dim = u32(dim);
         p.position = u32(position);
-        p.theta = theta;
         u32(x.size());
         if (x.empty())
             return;
-        Buffer xb(x), yb(x.size());
-        cuda_kernels::rope<<<blocks(x.size() / 2), 128>>>(xb.data, yb.data, p);
+        Buffer xb(x), yb(x.size()), fb(inv_freq);
+        cuda_kernels::rope<<<blocks(x.size() / 2), 128>>>(xb.data, yb.data, fb.data, p);
         finish();
         yb.copy(x);
     }

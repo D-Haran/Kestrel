@@ -96,14 +96,15 @@ class CpuBackend final : public Backend {
         for (auto &v : y)
             v /= sum;
     }
-    void rope(Output x, size_t heads, size_t dim, size_t position, float theta) override {
+    void rope(Output x, size_t heads, size_t dim, size_t position, Input inv_freq) override {
         require_size(x, checked_mul(heads, dim), "rope");
-        if (!dim || dim % 2 || !(theta > 0) || !std::isfinite(theta))
+        if (!dim || dim % 2)
             throw std::invalid_argument("invalid RoPE parameters");
+        require_size(inv_freq, dim / 2, "rope inv_freq");
         // Hugging Face Llama uses split-half rotate_half, not interleaved pairs.
         for (size_t h = 0; h < heads; ++h)
             for (size_t i = 0; i < dim / 2; ++i) {
-                float angle = float(position) * std::pow(theta, -2.f * float(i) / float(dim));
+                float angle = float(position) * inv_freq[i];
                 float a = x[h * dim + i], b = x[h * dim + i + dim / 2], c = std::cos(angle),
                       s = std::sin(angle);
                 x[h * dim + i] = a * c - b * s;

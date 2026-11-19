@@ -213,18 +213,18 @@ class MetalBackend final : public Backend {
         run("softmax", {xb, yb}, p, 1);
         copy(yb, y);
     }
-    void rope(Output x, size_t heads, size_t dim, size_t position, float theta) override {
+    void rope(Output x, size_t heads, size_t dim, size_t position, Input inv_freq) override {
         require_size(x, checked_mul(heads, dim), "rope");
-        if (!dim || dim % 2 || !(theta > 0) || !std::isfinite(theta))
+        if (!dim || dim % 2)
             throw std::invalid_argument("invalid RoPE");
+        require_size(inv_freq, dim / 2, "rope inv_freq");
         Params p;
         p.heads = u32(heads);
         p.dim = u32(dim);
         p.position = u32(position);
-        p.theta = theta;
         u32(x.size());
-        auto xb = buffer(x), yb = output(x.size());
-        run("rope", {xb, yb}, p, x.size() / 2);
+        auto xb = buffer(x), yb = output(x.size()), fb = buffer(inv_freq);
+        run("rope", {xb, yb, fb}, p, x.size() / 2);
         copy(yb, x);
     }
     void attention(Input q, Input k, Input v, Output y, size_t heads, size_t kv_heads, size_t dim,
@@ -305,15 +305,17 @@ class MetalBackend final : public Backend {
         rbuffers_ = true;
     }
     void resident_forward(Input embedding, std::span<const ResidentLayer> layers, Input final_norm,
-                          const TensorView &head, const ForwardDims &d, size_t position,
-                          Output logits) override {
+                          const TensorView &head, const ForwardDims &d, Input inv_freq,
+                          size_t position, Output logits) override {
         if (position >= d.capacity)
             throw std::out_of_range("resident forward position exceeds capacity");
         require_size(embedding, d.hidden, "resident embedding");
         require_size(logits, d.vocab, "resident logits");
+        require_size(inv_freq, d.head_dim / 2, "resident inv_freq");
         @autoreleasepool {
             ensure_resident(d, layers.size());
             std::memcpy([x_ contents], embedding.data(), d.hidden * sizeof(float));
+            id<MTLBuffer> freq = norm_buffer(inv_freq);
             const size_t h = d.hidden, inter = d.intermediate, hd = d.head_dim;
             const size_t kvw = d.kv_heads * hd, tokens = position + 1;
             const NSUInteger row = NSUInteger(position) * kvw * sizeof(float);
@@ -343,11 +345,10 @@ class MetalBackend final : public Backend {
                 Params pr;
                 pr.dim = u32(hd);
                 pr.position = u32(position);
-                pr.theta = d.theta;
                 pr.heads = u32(d.heads);
-                encode(enc, "rope", {{q_, 0}, {q_, 0}}, pr, d.heads * hd / 2);
+                encode(enc, "rope", {{q_, 0}, {q_, 0}, {freq, 0}}, pr, d.heads * hd / 2);
                 pr.heads = u32(d.kv_heads);
-                encode(enc, "rope", {{kc, row}, {kc, row}}, pr, d.kv_heads * hd / 2);
+                encode(enc, "rope", {{kc, row}, {kc, row}, {freq, 0}}, pr, d.kv_heads * hd / 2);
                 Params pa;
                 pa.heads = u32(d.heads);
                 pa.kv_heads = u32(d.kv_heads);

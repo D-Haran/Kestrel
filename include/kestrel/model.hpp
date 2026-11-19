@@ -46,7 +46,8 @@ class Model {
     const TensorView &weight(const std::string &name, std::vector<size_t> shape) const;
     Vec vector_weight(const std::string &name, size_t size) const;
     // Whole-pass forward encoded into one device command buffer (no host readback mid-pass).
-    Vec forward_resident(int token, size_t position);
+    Vec forward_resident(int token, size_t position, size_t capacity);
+    Vec inv_freq_; // Precomputed RoPE inverse frequencies (head_dim/2), with any llama3 scaling.
 };
 class Session {
   public:

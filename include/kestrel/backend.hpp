@@ -33,7 +33,9 @@ class Backend {
     virtual void multiply(Input a, Input b, Output y) = 0;
     virtual void silu(Input x, Output y) = 0;
     virtual void softmax(Input x, Output y) = 0;
-    virtual void rope(Output x, size_t heads, size_t dim, size_t position, float theta) = 0;
+    // inv_freq holds the precomputed inverse frequencies (dim/2), so any RoPE variant
+    // (plain or llama3-scaled) is selected by the caller, not recomputed here.
+    virtual void rope(Output x, size_t heads, size_t dim, size_t position, Input inv_freq) = 0;
     virtual void attention(Input q, Input k, Input v, Output y, size_t heads, size_t kv_heads,
                            size_t dim, size_t tokens) = 0;
     virtual void prepare_weight(const TensorView &) {}
@@ -53,9 +55,9 @@ class Backend {
     // are the output projection and final RMSNorm weights; logits receives the host result.
     virtual void resident_forward(Input embedding, std::span<const ResidentLayer> layers,
                                   Input final_norm, const TensorView &head, const ForwardDims &dims,
-                                  size_t position, Output logits) {
-        (void)embedding, (void)layers, (void)final_norm, (void)head, (void)dims, (void)position,
-            (void)logits;
+                                  Input inv_freq, size_t position, Output logits) {
+        (void)embedding, (void)layers, (void)final_norm, (void)head, (void)dims, (void)inv_freq,
+            (void)position, (void)logits;
         throw std::logic_error("resident_forward unsupported");
     }
 };

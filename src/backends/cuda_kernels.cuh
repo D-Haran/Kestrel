@@ -37,13 +37,13 @@ __global__ void rmsnorm(const float *x, const float *w, float *y, Params p) {
         sum += x[j] * x[j];
     y[i] = x[i] * rsqrtf(sum / float(p.n) + p.epsilon) * w[i];
 }
-__global__ void rope(const float *x, float *y, Params p) {
+__global__ void rope(const float *x, float *y, const float *inv_freq, Params p) {
     uint i = blockIdx.x * blockDim.x + threadIdx.x;
     if (i >= p.heads * p.dim / 2)
         return;
     uint h = i / (p.dim / 2), d = i % (p.dim / 2), offset = h * p.dim + d;
-    float angle = float(p.position) * powf(p.theta, -2.f * float(d) / float(p.dim)),
-          c = cosf(angle), s = sinf(angle), a = x[offset], b = x[offset + p.dim / 2];
+    float angle = float(p.position) * inv_freq[d], c = cosf(angle), s = sinf(angle), a = x[offset],
+          b = x[offset + p.dim / 2];
     y[offset] = a * c - b * s;
     y[offset + p.dim / 2] = b * c + a * s;
 }

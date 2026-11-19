@@ -12,9 +12,9 @@ kernel void elementwise(device const float* a [[buffer(0)]],device const float* 
 kernel void rmsnorm(device const float* x [[buffer(0)]],device const float* w [[buffer(1)]],device float* y [[buffer(2)]],constant Params& p [[buffer(3)]],uint i [[thread_position_in_grid]]) {
     if(i>=p.n)return;float sum=0;for(uint j=0;j<p.n;++j)sum+=x[j]*x[j];y[i]=x[i]*rsqrt(sum/float(p.n)+p.epsilon)*w[i];
 }
-kernel void rope(device const float* x [[buffer(0)]],device float* y [[buffer(1)]],constant Params& p [[buffer(2)]],uint i [[thread_position_in_grid]]) {
+kernel void rope(device const float* x [[buffer(0)]],device float* y [[buffer(1)]],device const float* inv_freq [[buffer(2)]],constant Params& p [[buffer(3)]],uint i [[thread_position_in_grid]]) {
     if(i>=p.heads*p.dim/2)return;uint h=i/(p.dim/2),d=i%(p.dim/2),offset=h*p.dim+d;
-    float angle=float(p.position)*pow(p.theta,-2.f*float(d)/float(p.dim)),c=cos(angle),s=sin(angle),a=x[offset],b=x[offset+p.dim/2];
+    float angle=float(p.position)*inv_freq[d],c=cos(angle),s=sin(angle),a=x[offset],b=x[offset+p.dim/2];
     y[offset]=a*c-b*s;y[offset+p.dim/2]=b*c+a*s;
 }
 kernel void softmax(device const float* x [[buffer(0)]],device float* y [[buffer(1)]],constant Params& p [[buffer(2)]],uint row [[thread_position_in_grid]]) {

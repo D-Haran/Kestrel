@@ -23,7 +23,8 @@ int main(int argc, char **argv) {
         b->softmax(x, y);
         j["softmax"] = y;
         y = x;
-        b->rope(y, 2, 8, 7, 10000);
+        Vec rope_freq{1.f, 0.1f, 0.01f, 0.001f}; // theta=10000, dim=8: pow(10000, -2i/8)
+        b->rope(y, 2, 8, 7, rope_freq);
         j["rope"] = y;
         b->add(x, w, y);
         j["add"] = y;

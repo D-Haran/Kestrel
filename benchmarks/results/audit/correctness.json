@@ -1,0 +1,920 @@
+{
+  "cpu": {
+    "backend": "cpu",
+    "identical": 50,
+    "total": 50,
+    "logit_max_overall": 4.57763671875e-05,
+    "logit_mean_overall": 6.115097582672034e-06,
+    "rows": [
+      {
+        "idx": 0,
+        "prompt": "Once upon a time",
+        "n_prompt": 5,
+        "identical": true,
+        "first_divergence": null,
+        "logit_max": 3.24249267578125e-05,
+        "logit_mean": 6.411734335415531e-06
+      },
+      {
+        "idx": 1,
+        "prompt": "The cat sat on",
+        "n_prompt": 5,
+        "identical": true,
+        "first_divergence": null,
+        "logit_max": 3.337860107421875e-05,
+        "logit_mean": 7.959428792673861e-06
+      },
+      {
+        "idx": 2,
+        "prompt": "Hello",
+        "n_prompt": 2,
+        "identical": true,
+        "first_divergence": null,
+        "logit_max": 2.3365020751953125e-05,
+        "logit_mean": 5.675793374393834e-06
+      },
+      {
+        "idx": 3,
+        "prompt": "She said",
+        "n_prompt": 3,
+        "identical": true,
+        "first_divergence": null,
+        "logit_max": 2.0503997802734375e-05,
+        "logit_mean": 3.566356403098325e-06
+      },
+      {
+        "idx": 4,
+        "prompt": "A big red",
+        "n_prompt": 4,
+        "identical": true,
+        "first_divergence": null,
+        "logit_max": 1.239776611328125e-05,
+        "logit_mean": 2.6764008798636494e-06
+      },
+      {
+        "idx": 5,
+        "prompt": "Tom and Jane",
+        "n_prompt": 4,
+        "identical": true,
+        "first_divergence": null,
+        "logit_max": 1.71661376953125e-05,
+        "logit_mean": 3.243377195758512e-06
+      },
+      {
+        "idx": 6,
+        "prompt": "It was a sunny day",
+        "n_prompt": 7,
+        "identical": true,
+        "first_divergence": null,
+        "logit_max": 4.57763671875e-05,
+        "logit_mean": 1.7184488637781215e-05
+      },
+      {
+        "idx": 7,
+        "prompt": "The end",
+        "n_prompt": 3,
+        "identical": true,
+        "first_divergence": null,
+        "logit_max": 3.0517578125e-05,
+        "logit_mean": 9.190371712975321e-06
+      },
+      {
+        "idx": 8,
+        "prompt": "Why did the",
+        "n_prompt": 4,
+        "identical": true,
+        "first_divergence": null,
+        "logit_max": 1.430511474609375e-05,
+        "logit_mean": 2.6828423724509776e-06
+      },
+      {
+        "idx": 9,
+        "prompt": "Run fast",
+        "n_prompt": 3,
+        "identical": true,
+        "first_divergence": null,
+        "logit_max": 2.3365020751953125e-05,
+        "logit_mean": 3.934875654749703e-06
+      },
+      {
+        "idx": 10,
+        "prompt": "Once upon a time there was a little girl",
+        "n_prompt": 23,
+        "identical": true,
+        "first_divergence": null,
+        "logit_max": 1.811981201171875e-05,
+        "logit_mean": 5.6507549597881734e-06
+      },
+      {
+        "idx": 11,
+        "prompt": "The old man walked slowly down the long ",
+        "n_prompt": 24,
+        "identical": true,
+        "first_divergence": null,
+        "logit_max": 1.9073486328125e-05,
+        "logit_mean": 3.884086910147744e-06
+      },
+      {
+        "idx": 12,
+        "prompt": "In the morning the children went outside",
+        "n_prompt": 23,
+        "identical": true,
+        "first_divergence": null,
+        "logit_max": 1.9550323486328125e-05,
+        "logit_mean": 4.365884201433801e-06
+      },
+      {
+        "idx": 13,
+        "prompt": "Every night before bed, the little boy a",
+        "n_prompt": 23,
+        "identical": true,
+        "first_divergence": null,
+        "logit_max": 1.7881393432617188e-05,
+        "logit_mean": 7.298462307971932e-06
+      },
+      {
+        "idx": 14,
+        "prompt": "The dog ran across the field as fast as ",
+        "n_prompt": 25,
+        "identical": true,
+        "first_divergence": null,
+        "logit_max": 2.47955322265625e-05,
+        "logit_mean": 1.113977523164067e-05
+      },
+      {
+        "idx": 15,
+        "prompt": "def add(a, b):\n    return",
+        "n_prompt": 11,
+        "identical": true,
+        "first_divergence": null,
+        "logit_max": 2.5272369384765625e-05,
+        "logit_mean": 3.5591808327808395e-06
+      },
+      {
+        "idx": 16,
+        "prompt": "for i in range(10):",
+        "n_prompt": 9,
+        "identical": true,
+        "first_divergence": null,
+        "logit_max": 2.3365020751953125e-05,
+        "logit_mean": 5.023569642162329e-06
+      },
+      {
+        "idx": 17,
+        "prompt": "import numpy as np\n",
+        "n_prompt": 6,
+        "identical": true,
+        "first_divergence": null,
+        "logit_max": 1.96993350982666e-05,
+        "logit_mean": 6.5114616445498544e-06
+      },
+      {
+        "idx": 18,
+        "prompt": "class Animal:\n    def __init__(self",
+        "n_prompt": 11,
+        "identical": true,
+        "first_divergence": null,
+        "logit_max": 1.430511474609375e-05,
+        "logit_mean": 2.577192318312882e-06
+      },
+      {
+        "idx": 19,
+        "prompt": "SELECT * FROM users WHERE",
+        "n_prompt": 6,
+        "identical": true,
+        "first_divergence": null,
+        "logit_max": 2.6226043701171875e-05,
+        "logit_mean": 8.370269436454692e-06
+      },
+      {
+        "idx": 20,
+        "prompt": "#include <stdio.h>\nint main() {",
+        "n_prompt": 13,
+        "identical": true,
+        "first_divergence": null,
+        "logit_max": 2.5033950805664062e-05,
+        "logit_mean": 1.0170668898368263e-05
+      },
+      {
+        "idx": 21,
+        "prompt": "print('hello world')",
+        "n_prompt": 6,
+        "identical": true,
+        "first_divergence": null,
+        "logit_max": 3.075599670410156e-05,
+        "logit_mean": 6.832952778722756e-06
+      },
+      {
+        "idx": 22,
+        "prompt": "x = [1, 2, 3]\n",
+        "n_prompt": 13,
+        "identical": true,
+        "first_divergence": null,
+        "logit_max": 1.8477439880371094e-05,
+        "logit_mean": 5.0114734985982064e-06
+      },
+      {
+        "idx": 23,
+        "prompt": "if x > 0:\n    print",
+        "n_prompt": 10,
+        "identical": true,
+        "first_divergence": null,
+        "logit_max": 2.2411346435546875e-05,
+        "logit_mean": 4.401251339686496e-06
+      },
+      {
+        "idx": 24,
+        "prompt": "while True:",
+        "n_prompt": 4,
+        "identical": true,
+        "first_divergence": null,
+        "logit_max": 2.3126602172851562e-05,
+        "logit_mean": 4.434126400155947e-06
+      },
+      {
+        "idx": 25,
+        "prompt": "2 + 2 =",
+        "n_prompt": 7,
+        "identical": true,
+        "first_divergence": null,
+        "logit_max": 2.5272369384765625e-05,
+        "logit_mean": 7.2176638284418005e-06
+      },
+      {
+        "idx": 26,
+        "prompt": "The sum of 5 and 7 is",
+        "n_prompt": 10,
+        "identical": true,
+        "first_divergence": null,
+        "logit_max": 3.4332275390625e-05,
+        "logit_mean": 1.1279041489615337e-05
+      },
+      {
+        "idx": 27,
+        "prompt": "10 times 10 equals",
+        "n_prompt": 9,
+        "identical": true,
+        "first_divergence": null,
+        "logit_max": 2.2530555725097656e-05,
+        "logit_mean": 3.764071796922508e-06
+      },
+      {
+        "idx": 28,
+        "prompt": "One plus one",
+        "n_prompt": 4,
+        "identical": true,
+        "first_divergence": null,
+        "logit_max": 1.9073486328125e-05,
+        "logit_mean": 3.186293921316974e-06
+      },
+      {
+        "idx": 29,
+        "prompt": "Half of 100 is",
+        "n_prompt": 8,
+        "identical": true,
+        "first_divergence": null,
+        "logit_max": 2.86102294921875e-05,
+        "logit_mean": 6.8577994825318455e-06
+      },
+      {
+        "idx": 30,
+        "prompt": "3, 6, 9, 12,",
+        "n_prompt": 14,
+        "identical": true,
+        "first_divergence": null,
+        "logit_max": 3.24249267578125e-05,
+        "logit_mean": 1.359662452887278e-05
+      },
+      {
+        "idx": 31,
+        "prompt": "The square root of 16",
+        "n_prompt": 8,
+        "identical": true,
+        "first_divergence": null,
+        "logit_max": 2.7120113372802734e-05,
+        "logit_mean": 3.779569135076599e-06
+      },
+      {
+        "idx": 32,
+        "prompt": "Pi is approximately",
+        "n_prompt": 4,
+        "identical": true,
+        "first_divergence": null,
+        "logit_max": 1.7642974853515625e-05,
+        "logit_mean": 3.4151194222431515e-06
+      },
+      {
+        "idx": 33,
+        "prompt": "A triangle has three",
+        "n_prompt": 5,
+        "identical": true,
+        "first_divergence": null,
+        "logit_max": 2.3365020751953125e-05,
+        "logit_mean": 4.085993608669014e-06
+      },
+      {
+        "idx": 34,
+        "prompt": "Count: 1 2 3",
+        "n_prompt": 9,
+        "identical": true,
+        "first_divergence": null,
+        "logit_max": 1.71661376953125e-05,
+        "logit_mean": 3.4104346526646624e-06
+      },
+      {
+        "idx": 35,
+        "prompt": "Bonjour le monde",
+        "n_prompt": 6,
+        "identical": true,
+        "first_divergence": null,
+        "logit_max": 3.24249267578125e-05,
+        "logit_mean": 1.2266109796655655e-05
+      },
+      {
+        "idx": 36,
+        "prompt": "Hola, \u00bfc\u00f3mo est\u00e1s?",
+        "n_prompt": 11,
+        "identical": true,
+        "first_divergence": null,
+        "logit_max": 2.276897430419922e-05,
+        "logit_mean": 4.502541413103245e-06
+      },
+      {
+        "idx": 37,
+        "prompt": "Guten Tag",
+        "n_prompt": 4,
+        "identical": true,
+        "first_divergence": null,
+        "logit_max": 2.002716064453125e-05,
+        "logit_mean": 5.221225305831467e-06
+      },
+      {
+        "idx": 38,
+        "prompt": "\u3053\u3093\u306b\u3061\u306f\u4e16\u754c",
+        "n_prompt": 9,
+        "identical": true,
+        "first_divergence": null,
+        "logit_max": 1.4066696166992188e-05,
+        "logit_mean": 2.7692616322383403e-06
+      },
+      {
+        "idx": 39,
+        "prompt": "\u041f\u0440\u0438\u0432\u0435\u0442 \u043c\u0438\u0440",
+        "n_prompt": 5,
+        "identical": true,
+        "first_divergence": null,
+        "logit_max": 1.811981201171875e-05,
+        "logit_mean": 2.88810385893612e-06
+      },
+      {
+        "idx": 40,
+        "prompt": "Ciao mondo",
+        "n_prompt": 4,
+        "identical": true,
+        "first_divergence": null,
+        "logit_max": 3.0279159545898438e-05,
+        "logit_mean": 1.3081881779726246e-05
+      },
+      {
+        "idx": 41,
+        "prompt": "El gato duerme",
+        "n_prompt": 6,
+        "identical": true,
+        "first_divergence": null,
+        "logit_max": 1.8596649169921875e-05,
+        "logit_mean": 3.169801299009123e-06
+      },
+      {
+        "idx": 42,
+        "prompt": "La petite fille",
+        "n_prompt": 4,
+        "identical": true,
+        "first_divergence": null,
+        "logit_max": 1.6927719116210938e-05,
+        "logit_mean": 3.233949475543341e-06
+      },
+      {
+        "idx": 43,
+        "prompt": "Das Kind spielt",
+        "n_prompt": 5,
+        "identical": true,
+        "first_divergence": null,
+        "logit_max": 2.9087066650390625e-05,
+        "logit_mean": 9.538456419249997e-06
+      },
+      {
+        "idx": 44,
+        "prompt": "Il fait beau aujourd'hui",
+        "n_prompt": 8,
+        "identical": true,
+        "first_divergence": null,
+        "logit_max": 2.1457672119140625e-05,
+        "logit_mean": 3.676334510601009e-06
+      },
+      {
+        "idx": 45,
+        "prompt": "The quick brown fox",
+        "n_prompt": 6,
+        "identical": true,
+        "first_divergence": null,
+        "logit_max": 1.9550323486328125e-05,
+        "logit_mean": 4.95613252678595e-06
+      },
+      {
+        "idx": 46,
+        "prompt": "To be or not to be",
+        "n_prompt": 7,
+        "identical": true,
+        "first_divergence": null,
+        "logit_max": 2.384185791015625e-05,
+        "logit_mean": 4.4979106169193985e-06
+      },
+      {
+        "idx": 47,
+        "prompt": "Dear friend,",
+        "n_prompt": 5,
+        "identical": true,
+        "first_divergence": null,
+        "logit_max": 4.1961669921875e-05,
+        "logit_mean": 8.066409463935997e-06
+      },
+      {
+        "idx": 48,
+        "prompt": "Breaking news:",
+        "n_prompt": 5,
+        "identical": true,
+        "first_divergence": null,
+        "logit_max": 3.170967102050781e-05,
+        "logit_mean": 9.763737265529925e-06
+      },
+      {
+        "idx": 49,
+        "prompt": "The weather today is",
+        "n_prompt": 5,
+        "identical": true,
+        "first_divergence": null,
+        "logit_max": 2.8133392333984375e-05,
+        "logit_mean": 5.773632143245777e-06
+      }
+    ]
+  },
+  "metal": {
+    "backend": "metal",
+    "identical": 50,
+    "total": 50,
+    "logit_max_overall": 4.00543212890625e-05,
+    "logit_mean_overall": 5.970160703724331e-06,
+    "rows": [
+      {
+        "idx": 0,
+        "prompt": "Once upon a time",
+        "n_prompt": 5,
+        "identical": true,
+        "first_divergence": null,
+        "logit_max": 2.6702880859375e-05,
+        "logit_mean": 4.149855356445187e-06
+      },
+      {
+        "idx": 1,
+        "prompt": "The cat sat on",
+        "n_prompt": 5,
+        "identical": true,
+        "first_divergence": null,
+        "logit_max": 2.9087066650390625e-05,
+        "logit_mean": 5.577246178290807e-06
+      },
+      {
+        "idx": 2,
+        "prompt": "Hello",
+        "n_prompt": 2,
+        "identical": true,
+        "first_divergence": null,
+        "logit_max": 2.47955322265625e-05,
+        "logit_mean": 4.784937545991852e-06
+      },
+      {
+        "idx": 3,
+        "prompt": "She said",
+        "n_prompt": 3,
+        "identical": true,
+        "first_divergence": null,
+        "logit_max": 2.6702880859375e-05,
+        "logit_mean": 6.8489778259390736e-06
+      },
+      {
+        "idx": 4,
+        "prompt": "A big red",
+        "n_prompt": 4,
+        "identical": true,
+        "first_divergence": null,
+        "logit_max": 1.811981201171875e-05,
+        "logit_mean": 5.960906681139022e-06
+      },
+      {
+        "idx": 5,
+        "prompt": "Tom and Jane",
+        "n_prompt": 4,
+        "identical": true,
+        "first_divergence": null,
+        "logit_max": 2.6702880859375e-05,
+        "logit_mean": 7.0589962942904095e-06
+      },
+      {
+        "idx": 6,
+        "prompt": "It was a sunny day",
+        "n_prompt": 7,
+        "identical": true,
+        "first_divergence": null,
+        "logit_max": 4.00543212890625e-05,
+        "logit_mean": 1.3119198220692851e-05
+      },
+      {
+        "idx": 7,
+        "prompt": "The end",
+        "n_prompt": 3,
+        "identical": true,
+        "first_divergence": null,
+        "logit_max": 2.86102294921875e-05,
+        "logit_mean": 5.871323566680075e-06
+      },
+      {
+        "idx": 8,
+        "prompt": "Why did the",
+        "n_prompt": 4,
+        "identical": true,
+        "first_divergence": null,
+        "logit_max": 2.574920654296875e-05,
+        "logit_mean": 1.1136924964375793e-05
+      },
+      {
+        "idx": 9,
+        "prompt": "Run fast",
+        "n_prompt": 3,
+        "identical": true,
+        "first_divergence": null,
+        "logit_max": 2.1457672119140625e-05,
+        "logit_mean": 3.5683185467405566e-06
+      },
+      {
+        "idx": 10,
+        "prompt": "Once upon a time there was a little girl",
+        "n_prompt": 23,
+        "identical": true,
+        "first_divergence": null,
+        "logit_max": 1.621246337890625e-05,
+        "logit_mean": 3.2881609222386033e-06
+      },
+      {
+        "idx": 11,
+        "prompt": "The old man walked slowly down the long ",
+        "n_prompt": 24,
+        "identical": true,
+        "first_divergence": null,
+        "logit_max": 3.147125244140625e-05,
+        "logit_mean": 1.010493502690224e-05
+      },
+      {
+        "idx": 12,
+        "prompt": "In the morning the children went outside",
+        "n_prompt": 23,
+        "identical": true,
+        "first_divergence": null,
+        "logit_max": 1.430511474609375e-05,
+        "logit_mean": 2.5988208117269095e-06
+      },
+      {
+        "idx": 13,
+        "prompt": "Every night before bed, the little boy a",
+        "n_prompt": 23,
+        "identical": true,
+        "first_divergence": null,
+        "logit_max": 1.2636184692382812e-05,
+        "logit_mean": 2.753693206159369e-06
+      },
+      {
+        "idx": 14,
+        "prompt": "The dog ran across the field as fast as ",
+        "n_prompt": 25,
+        "identical": true,
+        "first_divergence": null,
+        "logit_max": 1.71661376953125e-05,
+        "logit_mean": 4.250269037584076e-06
+      },
+      {
+        "idx": 15,
+        "prompt": "def add(a, b):\n    return",
+        "n_prompt": 11,
+        "identical": true,
+        "first_divergence": null,
+        "logit_max": 2.5272369384765625e-05,
+        "logit_mean": 5.988828494082554e-06
+      },
+      {
+        "idx": 16,
+        "prompt": "for i in range(10):",
+        "n_prompt": 9,
+        "identical": true,
+        "first_divergence": null,
+        "logit_max": 2.47955322265625e-05,
+        "logit_mean": 5.035978991827506e-06
+      },
+      {
+        "idx": 17,
+        "prompt": "import numpy as np\n",
+        "n_prompt": 6,
+        "identical": true,
+        "first_divergence": null,
+        "logit_max": 1.5303492546081543e-05,
+        "logit_mean": 2.6349909894634037e-06
+      },
+      {
+        "idx": 18,
+        "prompt": "class Animal:\n    def __init__(self",
+        "n_prompt": 11,
+        "identical": true,
+        "first_divergence": null,
+        "logit_max": 1.5497207641601562e-05,
+        "logit_mean": 3.545456976098649e-06
+      },
+      {
+        "idx": 19,
+        "prompt": "SELECT * FROM users WHERE",
+        "n_prompt": 6,
+        "identical": true,
+        "first_divergence": null,
+        "logit_max": 2.1457672119140625e-05,
+        "logit_mean": 4.493925730002956e-06
+      },
+      {
+        "idx": 20,
+        "prompt": "#include <stdio.h>\nint main() {",
+        "n_prompt": 13,
+        "identical": true,
+        "first_divergence": null,
+        "logit_max": 1.6689300537109375e-05,
+        "logit_mean": 4.0265125608272e-06
+      },
+      {
+        "idx": 21,
+        "prompt": "print('hello world')",
+        "n_prompt": 6,
+        "identical": true,
+        "first_divergence": null,
+        "logit_max": 2.0503997802734375e-05,
+        "logit_mean": 3.764296346162155e-06
+      },
+      {
+        "idx": 22,
+        "prompt": "x = [1, 2, 3]\n",
+        "n_prompt": 13,
+        "identical": true,
+        "first_divergence": null,
+        "logit_max": 2.3126602172851562e-05,
+        "logit_mean": 7.597409290610812e-06
+      },
+      {
+        "idx": 23,
+        "prompt": "if x > 0:\n    print",
+        "n_prompt": 10,
+        "identical": true,
+        "first_divergence": null,
+        "logit_max": 2.288818359375e-05,
+        "logit_mean": 4.220089974523944e-06
+      },
+      {
+        "idx": 24,
+        "prompt": "while True:",
+        "n_prompt": 4,
+        "identical": true,
+        "first_divergence": null,
+        "logit_max": 2.8371810913085938e-05,
+        "logit_mean": 5.614614776277449e-06
+      },
+      {
+        "idx": 25,
+        "prompt": "2 + 2 =",
+        "n_prompt": 7,
+        "identical": true,
+        "first_divergence": null,
+        "logit_max": 2.1219253540039062e-05,
+        "logit_mean": 4.044513008921058e-06
+      },
+      {
+        "idx": 26,
+        "prompt": "The sum of 5 and 7 is",
+        "n_prompt": 10,
+        "identical": true,
+        "first_divergence": null,
+        "logit_max": 3.147125244140625e-05,
+        "logit_mean": 9.8663315657177e-06
+      },
+      {
+        "idx": 27,
+        "prompt": "10 times 10 equals",
+        "n_prompt": 9,
+        "identical": true,
+        "first_divergence": null,
+        "logit_max": 3.260374069213867e-05,
+        "logit_mean": 7.003189310168523e-06
+      },
+      {
+        "idx": 28,
+        "prompt": "One plus one",
+        "n_prompt": 4,
+        "identical": true,
+        "first_divergence": null,
+        "logit_max": 2.6702880859375e-05,
+        "logit_mean": 7.168407653807662e-06
+      },
+      {
+        "idx": 29,
+        "prompt": "Half of 100 is",
+        "n_prompt": 8,
+        "identical": true,
+        "first_divergence": null,
+        "logit_max": 2.956390380859375e-05,
+        "logit_mean": 6.007749092532322e-06
+      },
+      {
+        "idx": 30,
+        "prompt": "3, 6, 9, 12,",
+        "n_prompt": 14,
+        "identical": true,
+        "first_divergence": null,
+        "logit_max": 2.4318695068359375e-05,
+        "logit_mean": 8.428194298176094e-06
+      },
+      {
+        "idx": 31,
+        "prompt": "The square root of 16",
+        "n_prompt": 8,
+        "identical": true,
+        "first_divergence": null,
+        "logit_max": 1.9550323486328125e-05,
+        "logit_mean": 3.7580421321763423e-06
+      },
+      {
+        "idx": 32,
+        "prompt": "Pi is approximately",
+        "n_prompt": 4,
+        "identical": true,
+        "first_divergence": null,
+        "logit_max": 2.2411346435546875e-05,
+        "logit_mean": 4.3115847311128165e-06
+      },
+      {
+        "idx": 33,
+        "prompt": "A triangle has three",
+        "n_prompt": 5,
+        "identical": true,
+        "first_divergence": null,
+        "logit_max": 2.3365020751953125e-05,
+        "logit_mean": 4.183868223435639e-06
+      },
+      {
+        "idx": 34,
+        "prompt": "Count: 1 2 3",
+        "n_prompt": 9,
+        "identical": true,
+        "first_divergence": null,
+        "logit_max": 1.6689300537109375e-05,
+        "logit_mean": 2.9094986855966454e-06
+      },
+      {
+        "idx": 35,
+        "prompt": "Bonjour le monde",
+        "n_prompt": 6,
+        "identical": true,
+        "first_divergence": null,
+        "logit_max": 1.6927719116210938e-05,
+        "logit_mean": 3.352692780936195e-06
+      },
+      {
+        "idx": 36,
+        "prompt": "Hola, \u00bfc\u00f3mo est\u00e1s?",
+        "n_prompt": 11,
+        "identical": true,
+        "first_divergence": null,
+        "logit_max": 3.1113624572753906e-05,
+        "logit_mean": 9.254026766996048e-06
+      },
+      {
+        "idx": 37,
+        "prompt": "Guten Tag",
+        "n_prompt": 4,
+        "identical": true,
+        "first_divergence": null,
+        "logit_max": 2.6464462280273438e-05,
+        "logit_mean": 9.710584040021786e-06
+      },
+      {
+        "idx": 38,
+        "prompt": "\u3053\u3093\u306b\u3061\u306f\u4e16\u754c",
+        "n_prompt": 9,
+        "identical": true,
+        "first_divergence": null,
+        "logit_max": 2.193450927734375e-05,
+        "logit_mean": 5.35411649480011e-06
+      },
+      {
+        "idx": 39,
+        "prompt": "\u041f\u0440\u0438\u0432\u0435\u0442 \u043c\u0438\u0440",
+        "n_prompt": 5,
+        "identical": true,
+        "first_divergence": null,
+        "logit_max": 2.86102294921875e-05,
+        "logit_mean": 1.2508626966905467e-05
+      },
+      {
+        "idx": 40,
+        "prompt": "Ciao mondo",
+        "n_prompt": 4,
+        "identical": true,
+        "first_divergence": null,
+        "logit_max": 2.8371810913085938e-05,
+        "logit_mean": 1.1814659229457902e-05
+      },
+      {
+        "idx": 41,
+        "prompt": "El gato duerme",
+        "n_prompt": 6,
+        "identical": true,
+        "first_divergence": null,
+        "logit_max": 2.47955322265625e-05,
+        "logit_mean": 6.766466563931317e-06
+      },
+      {
+        "idx": 42,
+        "prompt": "La petite fille",
+        "n_prompt": 4,
+        "identical": true,
+        "first_divergence": null,
+        "logit_max": 2.0265579223632812e-05,
+        "logit_mean": 5.6333970569539815e-06
+      },
+      {
+        "idx": 43,
+        "prompt": "Das Kind spielt",
+        "n_prompt": 5,
+        "identical": true,
+        "first_divergence": null,
+        "logit_max": 2.6702880859375e-05,
+        "logit_mean": 7.0756868472017236e-06
+      },
+      {
+        "idx": 44,
+        "prompt": "Il fait beau aujourd'hui",
+        "n_prompt": 8,
+        "identical": true,
+        "first_divergence": null,
+        "logit_max": 2.5272369384765625e-05,
+        "logit_mean": 7.437562696395617e-06
+      },
+      {
+        "idx": 45,
+        "prompt": "The quick brown fox",
+        "n_prompt": 6,
+        "identical": true,
+        "first_divergence": null,
+        "logit_max": 1.71661376953125e-05,
+        "logit_mean": 3.7075766940688484e-06
+      },
+      {
+        "idx": 46,
+        "prompt": "To be or not to be",
+        "n_prompt": 7,
+        "identical": true,
+        "first_divergence": null,
+        "logit_max": 2.193450927734375e-05,
+        "logit_mean": 3.822973230853676e-06
+      },
+      {
+        "idx": 47,
+        "prompt": "Dear friend,",
+        "n_prompt": 5,
+        "identical": true,
+        "first_divergence": null,
+        "logit_max": 3.6716461181640625e-05,
+        "logit_mean": 6.220295836101286e-06
+      },
+      {
+        "idx": 48,
+        "prompt": "Breaking news:",
+        "n_prompt": 5,
+        "identical": true,
+        "first_divergence": null,
+        "logit_max": 3.0517578125e-05,
+        "logit_mean": 6.198942302034993e-06
+      },
+      {
+        "idx": 49,
+        "prompt": "The weather today is",
+        "n_prompt": 5,
+        "identical": true,
+        "first_divergence": null,
+        "logit_max": 2.09808349609375e-05,
+        "logit_mean": 3.974380662839394e-06
+      }
+    ]
+  }
+}
