@@ -22,6 +22,9 @@ class Model {
     }
     // One causal transformer step; position must equal every layer's cache length.
     Vec forward(int token, size_t position, KVCache &cache, const Trace &trace = {});
+    void reset_backend_state() {
+        backend_.reset_resident_state();
+    }
 
   private:
     Config config_;
@@ -36,6 +39,8 @@ class Model {
     const TensorView *embedding_, *head_;
     const TensorView &weight(const std::string &name, std::vector<size_t> shape) const;
     Vec vector_weight(const std::string &name, size_t size) const;
+    // Whole-pass forward encoded into one device command buffer (no host readback mid-pass).
+    Vec forward_resident(int token, size_t position);
 };
 class Session {
   public:
@@ -45,9 +50,11 @@ class Session {
     Profiler &profiler() { return model_.profiler; }
     void reset() {
         cache_.clear();
+        position_ = 0;
+        model_.reset_backend_state();
     }
     size_t position() const {
-        return cache_.length(0);
+        return position_;
     }
     size_t cache_bytes() const {
         return cache_.bytes();
@@ -56,5 +63,6 @@ class Session {
   private:
     Model &model_;
     ContiguousKVCache cache_;
+    size_t position_ = 0;
 };
 } // namespace kestrel

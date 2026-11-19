@@ -1,0 +1,5 @@
+backend,prompt_tokens,generated_tokens,prefill_tok_s,decode_tok_s,ttft_ms,min_inter_ms,max_inter_ms,p50_inter_ms,measured_runs,warmup
+cpu,128,128,37.64,36.91,3401.0,26.456,36.281,27.048,5,1
+cpu,32,128,37.87,37.37,845.0,26.153,33.642,26.712,5,1
+metal,128,128,28.79,26.16,4446.0,24.974,113.733,34.634,5,1
+metal,32,128,22.85,21.81,1400.3,26.733,62.886,47.634,5,1

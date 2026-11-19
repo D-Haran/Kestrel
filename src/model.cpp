@@ -54,6 +54,10 @@ Vec Model::forward(int token, size_t pos, KVCache &cache, const Trace &trace) {
         throw std::out_of_range("token ID outside vocabulary");
     if (pos >= c.max_positions || pos >= cache.capacity())
         throw std::out_of_range("context capacity exceeded");
+    // Fast path: encode the whole step into one device command buffer with the KV cache and
+    // activations resident. Tracing needs per-op host values, so it keeps the op-by-op path.
+    if (b.supports_resident_forward() && !trace)
+        return forward_resident(token, pos);
     for (size_t l = 0; l < c.layers; ++l)
         if (cache.length(l) != pos)
             throw std::logic_error("inconsistent KV cache position; reset the session");
@@ -103,6 +107,21 @@ Vec Model::forward(int token, size_t pos, KVCache &cache, const Trace &trace) {
         trace("logits", pos, logits);
     return logits;
 }
+Vec Model::forward_resident(int token, size_t pos) {
+    auto &c = config_;
+    Vec embedding(c.hidden);
+    for (size_t i = 0; i < c.hidden; ++i)
+        embedding[i] = embedding_->at(size_t(token) * c.hidden + i);
+    std::vector<ResidentLayer> layers;
+    layers.reserve(layers_.size());
+    for (const auto &w : layers_)
+        layers.push_back({w.q, w.k, w.v, w.o, w.gate, w.up, w.down, w.input_norm, w.post_norm});
+    ForwardDims dims{c.hidden,  c.intermediate, c.heads,   c.kv_heads,      c.head_dim(),
+                     c.vocab,   c.max_positions, c.epsilon, c.theta};
+    Vec logits(c.vocab);
+    backend_.resident_forward(embedding, layers, final_norm_, *head_, dims, pos, logits);
+    return logits;
+}
 Vec Session::prefill(std::span<const int> prompt, const Trace &trace) {
     if (prompt.empty())
         throw std::invalid_argument("prompt must contain at least one token");
@@ -114,8 +133,10 @@ Vec Session::prefill(std::span<const int> prompt, const Trace &trace) {
     reset();
     Vec logits;
     try {
-        for (int token : prompt)
-            logits = model_.forward(token, position(), cache_, trace);
+        for (int token : prompt) {
+            logits = model_.forward(token, position_, cache_, trace);
+            ++position_;
+        }
     } catch (...) {
         reset();
         throw;
@@ -126,7 +147,9 @@ Vec Session::decode(int token, const Trace &trace) {
     if (position() == 0)
         throw std::logic_error("decode requires prefill");
     try {
-        return model_.forward(token, position(), cache_, trace);
+        auto logits = model_.forward(token, position_, cache_, trace);
+        ++position_;
+        return logits;
     } catch (...) {
         reset();
         throw;

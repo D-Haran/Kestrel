@@ -7,6 +7,8 @@
 #include <cstring>
 #include <map>
 #include <stdexcept>
+#include <utility>
+#include <vector>
 namespace kestrel {
 namespace {
 struct Params {
@@ -28,7 +30,13 @@ class MetalBackend final : public Backend {
     id<MTLCommandQueue> queue_;
     std::map<std::string, id<MTLComputePipelineState>> pipelines_;
     std::map<const std::byte *, id<MTLBuffer>> weights_;
+    std::map<const float *, id<MTLBuffer>> norms_;
     size_t resident_ = 0;
+    // Device-resident scratch for the fused forward path, allocated once per model.
+    ForwardDims rdims_{};
+    bool rbuffers_ = false;
+    id<MTLBuffer> x_, norm_, q_, att_, proj_, gate_, up_, scores_, probs_, logits_;
+    std::vector<id<MTLBuffer>> key_cache_, val_cache_;
     id<MTLBuffer> buffer(Input input) {
         auto b = input.empty()
                      ? [device_ newBufferWithLength:4 options:MTLResourceStorageModeShared]
@@ -136,6 +144,10 @@ class MetalBackend final : public Backend {
     void release_weights() override {
         weights_.clear();
         resident_ = 0;
+        rbuffers_ = false;
+        key_cache_.clear();
+        val_cache_.clear();
+        norms_.clear();
     }
     size_t resident_weight_bytes() const override {
         return resident_;
@@ -234,6 +246,155 @@ class MetalBackend final : public Backend {
         run("softmax", {scores, probs}, p, heads);
         run("attention_values", {probs, vb, yb}, p, y.size());
         copy(yb, y);
+    }
+
+    // ---- Resident fused-forward path (Fix #1) ----
+    bool supports_resident_forward() const override {
+        return true;
+    }
+    id<MTLBuffer> device_weight(const TensorView &w) {
+        return weights_.contains(w.data()) ? weights_.at(w.data()) : weight_buffer(w);
+    }
+    id<MTLBuffer> norm_buffer(Input w) {
+        if (!norms_.contains(w.data()))
+            norms_[w.data()] = buffer(w);
+        return norms_.at(w.data());
+    }
+    // Encode one kernel into an already-open encoder; no commit, no wait. Each entry is a
+    // {buffer, byte offset} so projections can write straight into a KV cache row.
+    void encode(id<MTLComputeCommandEncoder> enc, const char *name,
+                std::initializer_list<std::pair<id<MTLBuffer>, NSUInteger>> buffers,
+                const Params &p, size_t count) {
+        if (!count)
+            return;
+        auto pipeline = pipelines_.at(name);
+        [enc setComputePipelineState:pipeline];
+        NSUInteger index = 0;
+        for (auto &b : buffers)
+            [enc setBuffer:b.first offset:b.second atIndex:index++];
+        [enc setBytes:&p length:sizeof(p) atIndex:index];
+        NSUInteger width = std::min(NSUInteger(128), pipeline.maxTotalThreadsPerThreadgroup);
+        [enc dispatchThreads:MTLSizeMake(count, 1, 1)
+            threadsPerThreadgroup:MTLSizeMake(width, 1, 1)];
+    }
+    void ensure_resident(const ForwardDims &d, size_t layers) {
+        bool same = rbuffers_ && rdims_.hidden == d.hidden && rdims_.intermediate == d.intermediate &&
+                    rdims_.heads == d.heads && rdims_.kv_heads == d.kv_heads &&
+                    rdims_.head_dim == d.head_dim && rdims_.vocab == d.vocab &&
+                    rdims_.capacity == d.capacity && key_cache_.size() == layers;
+        if (same)
+            return;
+        size_t kvw = d.kv_heads * d.head_dim;
+        x_ = output(d.hidden);
+        norm_ = output(d.hidden);
+        q_ = output(d.heads * d.head_dim);
+        att_ = output(d.hidden);
+        proj_ = output(d.hidden);
+        gate_ = output(d.intermediate);
+        up_ = output(d.intermediate);
+        scores_ = output(d.heads * d.capacity);
+        probs_ = output(d.heads * d.capacity);
+        logits_ = output(d.vocab);
+        key_cache_.assign(layers, nil);
+        val_cache_.assign(layers, nil);
+        for (size_t l = 0; l < layers; ++l) {
+            key_cache_[l] = output(d.capacity * kvw);
+            val_cache_[l] = output(d.capacity * kvw);
+        }
+        rdims_ = d;
+        rbuffers_ = true;
+    }
+    void resident_forward(Input embedding, std::span<const ResidentLayer> layers, Input final_norm,
+                          const TensorView &head, const ForwardDims &d, size_t position,
+                          Output logits) override {
+        if (position >= d.capacity)
+            throw std::out_of_range("resident forward position exceeds capacity");
+        require_size(embedding, d.hidden, "resident embedding");
+        require_size(logits, d.vocab, "resident logits");
+        @autoreleasepool {
+            ensure_resident(d, layers.size());
+            std::memcpy([x_ contents], embedding.data(), d.hidden * sizeof(float));
+            const size_t h = d.hidden, inter = d.intermediate, hd = d.head_dim;
+            const size_t kvw = d.kv_heads * hd, tokens = position + 1;
+            const NSUInteger row = NSUInteger(position) * kvw * sizeof(float);
+            auto begin = diagnostics.enabled ? Profiler::Clock::now() : Profiler::Clock::time_point{};
+            auto command = [queue_ commandBuffer];
+            auto enc = [command computeCommandEncoder];
+            if (!command || !enc)
+                throw std::runtime_error("Metal command allocation failed");
+            auto mat = [&](const TensorView &w, id<MTLBuffer> xb, NSUInteger xoff, id<MTLBuffer> yb,
+                          NSUInteger yoff, size_t rows) {
+                Params p;
+                p.rows = u32(w.shape()[0]);
+                p.cols = u32(w.shape()[1]);
+                p.batch = 1;
+                encode(enc, "matmul", {{device_weight(w), 0}, {xb, xoff}, {yb, yoff}}, p, rows);
+            };
+            for (size_t l = 0; l < layers.size(); ++l) {
+                const auto &w = layers[l];
+                id<MTLBuffer> kc = key_cache_[l], vc = val_cache_[l];
+                Params pn;
+                pn.n = u32(h);
+                pn.epsilon = d.epsilon;
+                encode(enc, "rmsnorm", {{x_, 0}, {norm_buffer(w.input_norm), 0}, {norm_, 0}}, pn, h);
+                mat(*w.q, norm_, 0, q_, 0, h);
+                mat(*w.k, norm_, 0, kc, row, kvw);
+                mat(*w.v, norm_, 0, vc, row, kvw);
+                Params pr;
+                pr.dim = u32(hd);
+                pr.position = u32(position);
+                pr.theta = d.theta;
+                pr.heads = u32(d.heads);
+                encode(enc, "rope", {{q_, 0}, {q_, 0}}, pr, d.heads * hd / 2);
+                pr.heads = u32(d.kv_heads);
+                encode(enc, "rope", {{kc, row}, {kc, row}}, pr, d.kv_heads * hd / 2);
+                Params pa;
+                pa.heads = u32(d.heads);
+                pa.kv_heads = u32(d.kv_heads);
+                pa.dim = u32(hd);
+                pa.tokens = u32(tokens);
+                pa.rows = u32(d.heads);
+                pa.n = u32(tokens);
+                encode(enc, "attention_scores", {{q_, 0}, {kc, 0}, {scores_, 0}}, pa,
+                       d.heads * tokens);
+                encode(enc, "softmax", {{scores_, 0}, {probs_, 0}}, pa, d.heads);
+                encode(enc, "attention_values", {{probs_, 0}, {vc, 0}, {att_, 0}}, pa, h);
+                mat(*w.o, att_, 0, proj_, 0, h);
+                Params pe;
+                pe.n = u32(h);
+                encode(enc, "elementwise", {{x_, 0}, {proj_, 0}, {x_, 0}}, pe, h); // residual add
+                encode(enc, "rmsnorm", {{x_, 0}, {norm_buffer(w.post_norm), 0}, {norm_, 0}}, pn, h);
+                mat(*w.gate, norm_, 0, gate_, 0, inter);
+                mat(*w.up, norm_, 0, up_, 0, inter);
+                Params ps;
+                ps.n = u32(inter);
+                ps.operation = 2;
+                encode(enc, "elementwise", {{gate_, 0}, {gate_, 0}, {gate_, 0}}, ps, inter); // SiLU
+                ps.operation = 1;
+                encode(enc, "elementwise", {{gate_, 0}, {up_, 0}, {gate_, 0}}, ps, inter); // gate*up
+                mat(*w.down, gate_, 0, proj_, 0, h);
+                encode(enc, "elementwise", {{x_, 0}, {proj_, 0}, {x_, 0}}, pe, h); // residual add
+            }
+            Params pf;
+            pf.n = u32(h);
+            pf.epsilon = d.epsilon;
+            encode(enc, "rmsnorm", {{x_, 0}, {norm_buffer(final_norm), 0}, {norm_, 0}}, pf, h);
+            mat(head, norm_, 0, logits_, 0, d.vocab);
+            [enc endEncoding];
+            [command commit];
+            auto submitted = diagnostics.enabled ? Profiler::Clock::now() : Profiler::Clock::time_point{};
+            [command waitUntilCompleted];
+            if (diagnostics.enabled) {
+                auto done = Profiler::Clock::now();
+                diagnostics.record("Encoding and submission",
+                                   std::chrono::duration<double, std::milli>(submitted - begin).count());
+                diagnostics.record("Waiting",
+                                   std::chrono::duration<double, std::milli>(done - submitted).count());
+            }
+            if (command.status == MTLCommandBufferStatusError)
+                throw std::runtime_error("Metal execution failed: " + error_text(command.error));
+            std::memcpy(logits.data(), [logits_ contents], d.vocab * sizeof(float));
+        }
     }
 };
 std::unique_ptr<Backend> make_metal_backend() {
